@@ -1,0 +1,12 @@
+# Local data
+history_peserta_wisuda/
+.tmp/
+
+# Node/Next build artifacts
+node_modules/
+frontend/node_modules/
+frontend/.next/
+
+# Environment files
+backend/.env
+frontend/.env.local

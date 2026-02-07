@@ -1,0 +1,32 @@
+{
+  "periode_mapping": [
+    { "periode": 73, "tahun": 2020, "bulan": "Januari", "tanggal": null },
+    { "periode": 74, "tahun": 2020, "bulan": "April", "tanggal": null },
+    { "periode": 75, "tahun": 2020, "bulan": "Juli", "tanggal": null },
+    { "periode": 76, "tahun": 2020, "bulan": "Oktober", "tanggal": null },
+    { "periode": 77, "tahun": 2021, "bulan": "Januari", "tanggal": null },
+    { "periode": 78, "tahun": 2021, "bulan": "April", "tanggal": null },
+    { "periode": 79, "tahun": 2021, "bulan": "Juli", "tanggal": null },
+    { "periode": 80, "tahun": 2021, "bulan": "Oktober", "tanggal": null },
+    { "periode": 81, "tahun": 2022, "bulan": "Januari", "tanggal": null },
+    { "periode": 82, "tahun": 2022, "bulan": "April", "tanggal": null },
+    { "periode": 83, "tahun": 2022, "bulan": "Juli", "tanggal": null },
+    { "periode": 84, "tahun": 2022, "bulan": "Oktober", "tanggal": null },
+    { "periode": 85, "tahun": 2023, "bulan": "Januari", "tanggal": null },
+    { "periode": 86, "tahun": 2023, "bulan": "April", "tanggal": null },
+    { "periode": 87, "tahun": 2023, "bulan": "Juli", "tanggal": null },
+    { "periode": 88, "tahun": 2023, "bulan": "Oktober", "tanggal": null },
+    { "periode": 89, "tahun": 2024, "bulan": "Januari", "tanggal": null },
+    { "periode": 90, "tahun": 2024, "bulan": "April", "tanggal": null },
+    { "periode": 91, "tahun": 2024, "bulan": "Juli", "tanggal": null },
+    { "periode": 92, "tahun": 2024, "bulan": "Oktober", "tanggal": null },
+    { "periode": 93, "tahun": 2025, "bulan": "Januari", "tanggal": null },
+    { "periode": 94, "tahun": 2025, "bulan": "April", "tanggal": null },
+    { "periode": 95, "tahun": 2025, "bulan": "Juli", "tanggal": null },
+    { "periode": 96, "tahun": 2025, "bulan": "Oktober", "tanggal": null },
+    { "periode": 97, "tahun": 2026, "bulan": "Januari", "tanggal": "24 Januari 2026" },
+    { "periode": 98, "tahun": 2026, "bulan": "April", "tanggal": null },
+    { "periode": 99, "tahun": 2026, "bulan": "Juli", "tanggal": null },
+    { "periode": 100, "tahun": 2026, "bulan": "Oktober", "tanggal": null }
+  ]
+}
