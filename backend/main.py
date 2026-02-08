@@ -7,7 +7,10 @@ from fastapi import FastAPI, HTTPException, Query
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.db import fetchall_dict, fetchone_value, get_conn
+try:
+    from backend.db import fetchall_dict, fetchone_value, get_conn
+except ModuleNotFoundError:
+    from db import fetchall_dict, fetchone_value, get_conn
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 

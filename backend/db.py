@@ -20,6 +20,9 @@ def get_conn():
             password=parsed.password,
         )
         conn.autocommit = True
+        # Set client encoding to UTF-8
+        with conn.cursor() as cur:
+            cur.execute("SET CLIENT_ENCODING TO 'UTF8'")
         return conn
 
     conn = pg8000.connect(
@@ -30,6 +33,9 @@ def get_conn():
         password=os.getenv("PGPASSWORD", "postgres"),
     )
     conn.autocommit = True
+    # Set client encoding to UTF-8
+    with conn.cursor() as cur:
+        cur.execute("SET CLIENT_ENCODING TO 'UTF8'")
     return conn
 
 
