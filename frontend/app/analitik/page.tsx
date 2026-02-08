@@ -18,6 +18,14 @@ interface AnalyticsResponse {
   invalid: number;
   byFakultas: AnalyticsBucket[];
   byProdi: AnalyticsBucket[];
+  byGender: AnalyticsBucket[];
+  byPredikat: AnalyticsBucket[];
+  byUnit: {
+    label: string;
+    approved: number;
+    total: number;
+    percentage: number;
+  }[];
 }
 
 export default function AnalitikPage() {
@@ -30,7 +38,10 @@ export default function AnalitikPage() {
     valid: 0,
     invalid: 0,
     byFakultas: [],
-    byProdi: []
+    byProdi: [],
+    byGender: [],
+    byPredikat: [],
+    byUnit: []
   });
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"raw" | "normalized">("raw");
@@ -95,7 +106,7 @@ export default function AnalitikPage() {
       setLoading(true);
       try {
         const res = await fetch(
-          `${apiBase}/api/analytics?periode=${selected}&mode=${mode}`
+          `${apiBase}/api/analytics?periode=${selected}&mode=${mode}&limit=1000`
         );
         if (!res.ok) {
           return;
@@ -210,9 +221,22 @@ export default function AnalitikPage() {
 
       <section className="analytics-grid">
         <div className="analytics-card">
-          <span className="label">Total Peserta</span>
-          <strong>{summary.total}</strong>
-          <p className="analytics-note">Periode {selected || "-"}</p>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <span className="label">Total Peserta</span>
+              <strong>{summary.total}</strong>
+              <p className="analytics-note">Periode {selected || "-"}</p>
+            </div>
+
+            <div style={{ textAlign: "right", marginTop: "4px" }}>
+              {(summary.byGender || []).map((item) => (
+                <div key={item.label} style={{ fontSize: "0.85rem", marginBottom: "4px", color: "var(--foreground)" }}>
+                  <span style={{ color: "var(--muted)", marginRight: "8px" }}>{item.label}</span>
+                  <span style={{ fontWeight: 600 }}>{item.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="analytics-card">
           <span className="label">Valid</span>
@@ -229,10 +253,12 @@ export default function AnalitikPage() {
       <section className="analytics-layout">
         <div className="analytics-panel">
           <div className="panel-header">
-            <h2>Komparasi Valid vs Tidak Valid</h2>
+            <h2>Validitas & Persetujuan</h2>
             <span className="panel-sub">Mode data: {mode}</span>
           </div>
-          <div className="validity-wrap">
+
+          {/* Validity Section */}
+          <div className="validity-wrap" style={{ marginBottom: "24px" }}>
             <div
               className="donut"
               style={{
@@ -264,39 +290,104 @@ export default function AnalitikPage() {
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="analytics-panel">
-          <div className="panel-header">
-            <h2>Top Fakultas</h2>
-            <span className="panel-sub">Berdasarkan jumlah peserta</span>
+          <hr style={{ border: "0", borderTop: "1px solid rgba(35,31,26,0.08)", margin: "0 0 16px" }} />
+
+          {/* Unit Approval Section */}
+          <div className="panel-header" style={{ marginBottom: "12px" }}>
+            <h3 style={{ fontSize: "0.95rem", margin: 0 }}>Approval Direktorat</h3>
+            <span className="panel-sub" style={{ fontSize: "0.75rem" }}>% Approved</span>
           </div>
           <div className="bar-stack">
-            {summary.byFakultas.map((item) => (
+            {(summary.byUnit || []).map((item) => (
               <div key={item.label} className="bar-row">
                 <span className="bar-label" title={item.label}>
                   {item.label}
                 </span>
                 <span className="bar-track">
                   <span
-                    className="bar-fill fakultas"
-                    style={{
-                      width: `${Math.max(4, (item.count / (maxFakultas || 1)) * 100)}%`
-                    }}
+                    className="bar-fill valid"
+                    style={{ width: `${item.percentage}%` }}
                   />
                 </span>
-                <span className="bar-value">{item.count}</span>
+                <span className="bar-value">{item.percentage}%</span>
               </div>
             ))}
           </div>
         </div>
 
+        <div className="col-stack">
+          <div className="analytics-panel">
+            <div className="panel-header">
+              <h2>Top Fakultas</h2>
+              <span className="panel-sub">Berdasarkan jumlah peserta</span>
+            </div>
+            <div className="bar-stack">
+              {summary.byFakultas.map((item) => {
+                const labelShort = item.label
+                  .replace(/Fakultas Ilmu Komputer/i, "FIK")
+                  .replace(/Fakultas Ekonomi dan Sosial/i, "FES")
+                  .replace(/Fakultas Sains dan Teknologi/i, "FST");
+                return (
+                  <div key={item.label} className="bar-row">
+                    <span className="bar-label" title={item.label}>
+                      {labelShort}
+                    </span>
+                    <span className="bar-track">
+                      <span
+                        className="bar-fill fakultas"
+                        style={{
+                          width: `${Math.max(4, (item.count / (maxFakultas || 1)) * 100)}%`
+                        }}
+                      />
+                    </span>
+                    <span className="bar-value">{item.count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="analytics-panel">
+            <div className="panel-header">
+              <h2>Predikat Kelulusan</h2>
+              <span className="panel-sub">Berdasarkan predikat</span>
+            </div>
+            <div className="bar-stack">
+              {(summary.byPredikat || [])
+                .filter((i) => i.count > 0)
+                .map((item, idx, arr) => {
+                  const counts = arr.map(x => x.count);
+                  const maxVal = counts.length > 0 ? Math.max(...counts) : 1;
+                  const pct = (item.count / maxVal) * 100;
+                  return (
+                    <div key={item.label} className="bar-row">
+                      <span className="bar-label" title={item.label}>
+                        {item.label}
+                      </span>
+                      <span className="bar-track">
+                        <span
+                          className="bar-fill"
+                          style={{
+                            background: "#d4a017",
+                            width: `${Math.max(4, pct)}%`
+                          }}
+                        />
+                      </span>
+                      <span className="bar-value">{item.count}</span>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </div>
+
         <div className="analytics-panel">
           <div className="panel-header">
-            <h2>Top Prodi</h2>
+            <h2>Semua Prodi</h2>
             <span className="panel-sub">Berdasarkan jumlah peserta</span>
           </div>
-          <div className="bar-stack">
+          <div className="bar-stack scrollable">
             {summary.byProdi.map((item) => (
               <div key={item.label} className="bar-row">
                 <span className="bar-label" title={item.label}>
@@ -315,6 +406,12 @@ export default function AnalitikPage() {
             ))}
           </div>
         </div>
+
+
+
+
+
+
       </section>
     </main>
   );

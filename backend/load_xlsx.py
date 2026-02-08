@@ -4,6 +4,7 @@ import os
 import re
 
 from openpyxl import load_workbook
+from typing import Optional
 
 try:
     from backend.db import get_conn
@@ -186,7 +187,7 @@ def to_number(value):
         return None
 
 
-def parse_periode(filename: str) -> int | None:
+def parse_periode(filename: str) -> Optional[int]:
     match = re.search(r"periode\s*(\d+)", filename.lower())
     if not match:
         return None

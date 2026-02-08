@@ -366,7 +366,7 @@ export default function HomePage() {
             </button>
           </div>
         </div>
-        <div className="control wide">
+        <div className="control">
           <label>Pencarian</label>
           <input
             value={query}
