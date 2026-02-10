@@ -2,6 +2,18 @@
 history_peserta_wisuda/
 .tmp/
 
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Error logs
+error_detail.txt
+load_error.txt
+*.log
+
 # Node/Next build artifacts
 node_modules/
 frontend/node_modules/
