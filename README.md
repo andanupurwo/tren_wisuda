@@ -269,7 +269,7 @@ This project is private. All rights reserved.
 
 ## 👤 Author
 
-**Anda Nupurwo**
+**Agus Tech**
 - GitHub: [@andanupurwo](https://github.com/andanupurwo)
 
 ## 🙏 Acknowledgments

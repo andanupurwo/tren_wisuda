@@ -317,7 +317,8 @@ export default function TrenPage() {
               <input
                 type="number"
                 value={yudisiumJan}
-                onChange={(event) => setYudisiumJan(Number(event.target.value))}
+                onChange={(event) => setYudisiumJan(event.target.value === '' ? 0 : Number(event.target.value))}
+                onFocus={(event) => event.target.select()}
               />
             </label>
             <label>
@@ -325,7 +326,8 @@ export default function TrenPage() {
               <input
                 type="number"
                 value={yudisiumFeb}
-                onChange={(event) => setYudisiumFeb(Number(event.target.value))}
+                onChange={(event) => setYudisiumFeb(event.target.value === '' ? 0 : Number(event.target.value))}
+                onFocus={(event) => event.target.select()}
               />
             </label>
             <label>
@@ -333,7 +335,8 @@ export default function TrenPage() {
               <input
                 type="number"
                 value={yudisiumMar}
-                onChange={(event) => setYudisiumMar(Number(event.target.value))}
+                onChange={(event) => setYudisiumMar(event.target.value === '' ? 0 : Number(event.target.value))}
+                onFocus={(event) => event.target.select()}
               />
             </label>
           </div>
@@ -389,38 +392,37 @@ export default function TrenPage() {
             const validWidth = (valid / maxTotal) * 100;
             const invalidWidth = (invalid / maxTotal) * 100;
             return (
-            <div
-              key={item.periode}
-              className={`bar-row bar-hover${
-                item.yearBand === 0
-                  ? " year-band-0"
-                  : item.yearBand === 1
-                  ? " year-band-1"
-                  : ""
-              }`}
-              onMouseLeave={() => setTooltip(null)}
-            >
-              <span
-                className="bar-label"
-                title={`Periode ${item.periode} · ${formatPeriodeDate(item)}`}
-              >
-                {item.periode} ({item.bulan} {item.tahun ?? ""})
-              </span>
-              <span
-                className="bar-track"
-                onMouseMove={(event) => showTooltip(event, item, valid, invalid)}
+              <div
+                key={item.periode}
+                className={`bar-row bar-hover${item.yearBand === 0
+                    ? " year-band-0"
+                    : item.yearBand === 1
+                      ? " year-band-1"
+                      : ""
+                  }`}
+                onMouseLeave={() => setTooltip(null)}
               >
                 <span
-                  className="bar-fill valid"
-                  style={{ width: `${validWidth}%` }}
-                />
+                  className="bar-label"
+                  title={`Periode ${item.periode} · ${formatPeriodeDate(item)}`}
+                >
+                  {item.periode} ({item.bulan} {item.tahun ?? ""})
+                </span>
                 <span
-                  className="bar-fill invalid"
-                  style={{ width: `${invalidWidth}%` }}
-                />
-              </span>
-              <span className="bar-value">{item.total}</span>
-            </div>
+                  className="bar-track"
+                  onMouseMove={(event) => showTooltip(event, item, valid, invalid)}
+                >
+                  <span
+                    className="bar-fill valid"
+                    style={{ width: `${validWidth}%` }}
+                  />
+                  <span
+                    className="bar-fill invalid"
+                    style={{ width: `${invalidWidth}%` }}
+                  />
+                </span>
+                <span className="bar-value">{item.total}</span>
+              </div>
             );
           })}
         </div>
