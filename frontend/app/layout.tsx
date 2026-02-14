@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   description: "Riwayat peserta wisuda per periode"
 };
 
+import { Suspense } from "react";
+
 export default function RootLayout({
   children
 }: Readonly<{
@@ -27,7 +29,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={`${displayFont.variable} ${bodyFont.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Suspense>
+          {children}
+        </Suspense>
+      </body>
     </html>
   );
 }

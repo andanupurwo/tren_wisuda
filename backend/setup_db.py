@@ -41,7 +41,7 @@ def ensure_database():
 
 
 def apply_schema():
-    schema_path = Path(__file__).resolve().parents[1] / "schema.sql"
+    schema_path = Path(__file__).resolve().parent / "schema.sql"
     sql = schema_path.read_text(encoding="utf-8")
     statements = [stmt.strip() for stmt in sql.split(";") if stmt.strip()]
 

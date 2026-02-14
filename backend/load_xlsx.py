@@ -285,8 +285,17 @@ def load_file(path: str):
 def main():
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     data_dir = os.path.join(base_dir, "history_peserta_wisuda")
+    
+    # Fallback for Docker environment (where script is in /app and data is in /app/history_peserta_wisuda)
+    if not os.path.exists(data_dir):
+        data_dir = os.path.join(os.path.dirname(__file__), "history_peserta_wisuda")
+
     pattern = os.path.join(data_dir, "*.xlsx")
+    print(f"DEBUG: base_dir={base_dir}")
+    print(f"DEBUG: data_dir={data_dir}")
+    print(f"DEBUG: pattern={pattern}")
     files = sorted(glob.glob(pattern))
+    print(f"DEBUG: files found={files}")
 
     if not files:
         print("Tidak ada file .xlsx ditemukan.")

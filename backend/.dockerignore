@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+venv/
+ENV/
+docker-compose.yml
+Dockerfile
+.git/
+.gitignore
+history_peserta_wisuda/
+*.xlsx
