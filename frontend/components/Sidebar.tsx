@@ -25,7 +25,9 @@ export default function Sidebar({ mode, onModeChange, loading, error }: SidebarP
         <aside className="sidebar">
             {/* Brand header — status dot di kanan judul */}
             <div className="sidebar-brand">
-                <div className="brand-icon">🎓</div>
+                <div className="brand-icon">
+                    <img src="/logo.svg" alt="Logo" width={32} height={32} />
+                </div>
                 <div className="brand-text">
                     <div className="brand-title">WisudaDB</div>
                     <div className="brand-sub">Dashboard</div>
