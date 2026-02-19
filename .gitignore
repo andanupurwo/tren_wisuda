@@ -1,13 +1,46 @@
-trash/
+# System & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.history/
+
+# Environment Variables (SENSITIVE)
 .env
 .env.local
-.venv
-venv
-__pycache__
+.env.*.local
+*.env
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
 *.pyc
-.DS_Store
-.history
-.vscode
-.idea
+package-lock.json
+!frontend/package-lock.json
+
+# Next.js / Frontend Build
+.next/
+out/
+build/
+coverage/
+
+# Backend / Python
+*.egg-info/
+dist/
+
+# Data & Exports (SENSITIVE)
 history_peserta_wisuda/
+postgres_data/
+*.xlsx
+*.csv
+*.zip
+*.sql
+*.log
+*.bak
+
+# Temporary Files
+tmp/
+list_browser_pages
 

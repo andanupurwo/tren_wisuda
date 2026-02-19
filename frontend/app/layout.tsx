@@ -1,38 +1,19 @@
 import type { Metadata } from "next";
-import { Fraunces, Space_Grotesk } from "next/font/google";
-
+import { Suspense } from "react";
 import "./globals.css";
 
-const displayFont = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-display"
-});
-
-const bodyFont = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-body"
-});
-
 export const metadata: Metadata = {
-  title: "Peserta Wisuda",
-  description: "Riwayat peserta wisuda per periode"
+  title: "WisudaDB — Dashboard Peserta Wisuda",
+  description: "Dashboard tren dan riwayat peserta wisuda per periode",
 };
 
-import { Suspense } from "react";
-
 export default function RootLayout({
-  children
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className={`${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang="id">
       <body>
-        <Suspense>
-          {children}
-        </Suspense>
+        <Suspense>{children}</Suspense>
       </body>
     </html>
   );

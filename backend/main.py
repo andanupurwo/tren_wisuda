@@ -3,14 +3,17 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi.responses import Response
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 
 try:
     from backend.db import fetchall_dict, fetchone_value, get_conn
+    from backend.load_xlsx import analyze_file, load_from_bytes, export_periode_to_csv
 except ModuleNotFoundError:
     from db import fetchall_dict, fetchone_value, get_conn
+    from load_xlsx import analyze_file, load_from_bytes, export_periode_to_csv
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
@@ -271,4 +274,133 @@ def trends_detail(mode: str = Query("raw")):
             )
             rows = fetchall_dict(cur)
 
+    return {"items": rows}
+
+
+# ─────────────────────────────────────────────────
+# IMPORT / EXPORT / DELETE
+# ─────────────────────────────────────────────────
+
+@app.post("/api/import/analyze")
+async def import_analyze(file: UploadFile = File(...)):
+    """Analyze an xlsx file and return column mapping info (no import)."""
+    if not file.filename or not file.filename.lower().endswith(".xlsx"):
+        raise HTTPException(status_code=400, detail="Hanya file .xlsx yang didukung.")
+    content = await file.read()
+    try:
+        result = analyze_file(content, file.filename)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return result
+
+
+@app.post("/api/import/upload")
+async def import_upload(
+    file: UploadFile = File(...),
+    periode: Optional[int] = Query(None, description="Override periode number"),
+):
+    """Import an xlsx file into the database."""
+    if not file.filename or not file.filename.lower().endswith(".xlsx"):
+        raise HTTPException(status_code=400, detail="Hanya file .xlsx yang didukung.")
+    content = await file.read()
+    try:
+        result = load_from_bytes(content, file.filename, periode_override=periode)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Import gagal: {str(e)}")
+    return result
+
+
+@app.get("/api/export/bulk")
+def export_bulk(
+    periodes: str = Query(..., description="Comma-separated periode numbers, e.g. 98,99"),
+    mode: str = Query("raw"),
+):
+    """Export multiple periods data as a single ZIP file containing CSVs."""
+    import zipfile
+    import io
+
+    if mode not in {"raw", "normalized"}:
+        raise HTTPException(status_code=400, detail="mode tidak valid")
+
+    try:
+        periode_list = [int(p.strip()) for p in periodes.split(",") if p.strip()]
+    except ValueError:
+        raise HTTPException(status_code=400, detail="periodes harus berupa angka dipisah koma")
+
+    if not periode_list:
+        raise HTTPException(status_code=400, detail="tidak ada periode yang dipilih")
+
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for p in periode_list:
+            csv_content = export_periode_to_csv(p, mode)
+            filename = f"wisuda_periode_{p}_{mode}.csv"
+            # Encode to utf-8-sig for Excel compatibility
+            zip_file.writestr(filename, csv_content.encode("utf-8-sig"))
+
+    zip_buffer.seek(0)
+    return Response(
+        content=zip_buffer.getvalue(),
+        media_type="application/zip",
+        headers={"Content-Disposition": 'attachment; filename="wisuda_export_bulk.zip"'},
+    )
+
+
+@app.get("/api/export/{periode}")
+def export_periode(
+    periode: int,
+    mode: str = Query("raw"),
+    fmt: str = Query("csv"),
+):
+    """Export a periode's data as CSV."""
+    if mode not in {"raw", "normalized"}:
+        raise HTTPException(status_code=400, detail="mode tidak valid")
+
+    csv_content = export_periode_to_csv(periode, mode)
+    filename = f"wisuda_periode_{periode}_{mode}.csv"
+    return Response(
+        content=csv_content.encode("utf-8-sig"),  # BOM for Excel compatibility
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.delete("/api/periode/{periode}")
+def delete_periode(periode: int):
+    """Delete all data for a specific periode."""
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM peserta_wisuda_raw WHERE periode = %s", [periode])
+            deleted_raw = cur.rowcount
+            cur.execute("DELETE FROM peserta_wisuda WHERE periode = %s", [periode])
+            deleted_norm = cur.rowcount
+        conn.commit()
+    return {"deleted_raw": deleted_raw, "deleted_normalized": deleted_norm, "periode": periode}
+
+
+@app.get("/api/import/history")
+def import_history():
+    """Return list of all imported periods with row counts from both tables."""
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT r.periode,
+                       r.total   AS raw_count,
+                       n.total   AS norm_count,
+                       r.updated AS last_updated
+                FROM (
+                    SELECT periode, COUNT(*) AS total, MAX(updated_at) AS updated
+                    FROM peserta_wisuda_raw GROUP BY periode
+                ) r
+                LEFT JOIN (
+                    SELECT periode, COUNT(*) AS total
+                    FROM peserta_wisuda GROUP BY periode
+                ) n USING (periode)
+                ORDER BY r.periode DESC
+                """
+            )
+            rows = fetchall_dict(cur)
     return {"items": rows}
