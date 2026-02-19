@@ -1,0 +1,12 @@
+
+trash/
+.env
+.env.local
+.venv
+venv
+__pycache__
+*.pyc
+.DS_Store
+.history
+.vscode
+.idea
