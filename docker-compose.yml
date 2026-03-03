@@ -7,6 +7,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
+      # Standardized: project 3 → port 5003
       - "5003:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -27,6 +28,7 @@ services:
       PGPASSWORD: ${POSTGRES_PASSWORD}
       CORS_ORIGINS: http://localhost:3003
     ports:
+      # Standardized: project 3 → port 8003
       - "8003:8000"
     depends_on:
       db:
@@ -46,6 +48,7 @@ services:
     environment:
       NEXT_PUBLIC_API_BASE: http://localhost:8003
     ports:
+      # Standardized: project 3 → port 3003
       - "3003:3000"
     depends_on:
       - backend
